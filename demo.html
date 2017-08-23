@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <input type="text" oninput="g(this.value)" id="aa">
+  <input type="text" id="fsize" value='12'>
+  <textarea name="" id="a" rows="30" style="width: 100%"></textarea>
+  <canvas id="myCanvas"></canvas>
+</body>
+<script>
+  function g(value) {
+    var txt = value
+    var size = +fsize.value
+
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+    ctx.font = size + "px Microsoft YaHei";
+    var obj = ctx.measureText(txt)
+    var width = Math.ceil(obj.width)
+    var ratio = 0.76
+    var height = size + 2 + Math.ceil(size * (1 - ratio))
+    c.width = width
+    c.height = height
+
+    ctx = c.getContext("2d");
+    ctx.font = size + "px Microsoft YaHei";
+    ctx.fillText(txt, 0, size + 1);
+
+    var gchart = function (number) {
+      return number > 85 ? number > 170 ? "###" : '###' : '   '
+      // return number > 0 ? "===" : '   '
+    }
+    try {
+      var data = ctx.getImageData(0, 0, width, height)
+      var arr = [' *   ' + Array(width).fill('   ').join('') + '\n *   ']
+      var empty = true
+      for (var i = 0; i < data.data.length; i += 4) {
+        if (i / 4 % width == 0 && i !== 0) {
+          if (empty) {
+            arr.splice(arr.length - width)
+          } else {
+            arr.push("\n *   ");
+          }
+          empty = true
+        }
+        var char = gchart(data.data[i + 3])
+        if (char !== '   ') empty = false
+        arr.push(char)
+      }
+      if (empty) {
+        arr.splice(arr.length - (width))
+      }
+      arr.splice(0, 0, ['/**' + Array(width + 2).fill('***').join('') + '\n'])
+      arr.push(Array(width).fill('   ').join(''))
+      arr.push('\n ' + Array(width + 2).fill('***').join('') + '*/')
+      a.value = arr.join('')
+    } catch (e) {
+      a.value = ''
+    }
+  }
+
+</script>
+
+</html>
